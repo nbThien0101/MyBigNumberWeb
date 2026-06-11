@@ -9,7 +9,7 @@ WORKDIR /build
 COPY cpp_src/ .
 
 # Compile the C++ executable
-RUN g++ -std=c++11 -O2 -o mybignumber_core main.cpp src/MyBigNumber.cpp
+RUN g++ -std=c++11 -O2 -static -o mybignumber_core main.cpp src/MyBigNumber.cpp
 
 # ============================================================
 # Stage 2: Build Spring Boot Application
