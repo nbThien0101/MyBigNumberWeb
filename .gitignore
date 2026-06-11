@@ -1,8 +1,8 @@
-# C++ and execution files
+# C++ binary and runtime log (rebuilt inside Docker, OS-specific)
 mybignumber_core
 history.log
 
-# Maven
+# Maven build output
 target/
 pom.xml.tag
 pom.xml.releaseBackup
@@ -12,7 +12,6 @@ release.properties
 dependency-reduced-pom.xml
 buildNumber.properties
 .mvn/timing.properties
-# https://github.com/takari/maven-wrapper#usage-without-binary-jar
 .mvn/wrapper/maven-wrapper.jar
 .mvn/wrapper/dists/
 
@@ -24,13 +23,7 @@ buildNumber.properties
 .classpath
 .settings/
 .factorypath
-*.sublime-workspace
 
 # OS files
 .DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
 Thumbs.db

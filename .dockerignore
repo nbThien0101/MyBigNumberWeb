@@ -1,0 +1,22 @@
+# Git
+.git
+.gitignore
+
+# IDE
+.idea
+.vscode
+*.iml
+
+# Build artifacts (will be rebuilt inside Docker)
+target/
+mybignumber_core
+history.log
+
+# Maven wrapper (Docker uses its own Maven)
+.mvn/
+mvnw
+mvnw.cmd
+
+# OS files
+.DS_Store
+Thumbs.db
