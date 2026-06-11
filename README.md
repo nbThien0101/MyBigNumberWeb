@@ -106,7 +106,6 @@ MyBigNumberWeb/
 ├── .gitignore                  
 ├── mvnw                        # Maven Wrapper script
 ├── pom.xml                     # Maven dependencies
-├── REPORT.md                   # Báo cáo kỹ thuật chi tiết của dự án
 └── README.md
 ```
 
