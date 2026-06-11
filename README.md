@@ -32,69 +32,90 @@ Người dùng                  Spring Boot                   C++ Engine
     │ <─────────────────────────│                              │
 ```
 
+Dự án này sử dụng kiến trúc Monorepo, chứa cả mã nguồn C++ và Java trong cùng một nơi. Quá trình triển khai được tối ưu hóa bằng **Docker Multi-stage Build** để tự động biên dịch chéo và tạo ra môi trường chạy gọn nhẹ.
+
 ## 🛠️ Yêu cầu hệ thống
 
-- **Java 17+** — Kiểm tra: `java -version`
-- **File thực thi C++** — `mybignumber_core` đặt tại thư mục gốc của project
+Bạn có thể chạy dự án này theo 2 cách, yêu cầu cấu hình sẽ khác nhau:
+- **Cách 1 (Docker - Khuyên dùng):** Chỉ cần cài đặt [Docker](https://www.docker.com/).
+- **Cách 2 (Chạy trực tiếp):** Cần cài đặt **Java 17+** và trình biên dịch C++ (**g++**).
 
-## 🚀 Cách chạy
+---
 
-### 1. Biên dịch C++ Core (nếu chưa có file `mybignumber_core`)
+## 🚀 Cách chạy dự án
+
+### Cách 1: Sử dụng Docker (Khuyên dùng)
+
+Đây là cách đơn giản nhất, Docker sẽ tự động biên dịch C++, build Spring Boot và thiết lập môi trường hoàn chỉnh.
 
 ```bash
-# Vào thư mục Task 1
-cd ../MyBigNumber
+# 1. Build Docker image
+docker build -t mybignumber-web .
 
-# Biên dịch
-g++ -o mybignumber_core main.cpp src/MyBigNumber.cpp
+# 2. Chạy container ở port 8080
+docker run -d -p 8080:8080 --name mybignumber mybignumber-web
 
-# Copy file thực thi sang project web
-cp mybignumber_core ../MyBigNumberWeb/
+# 3. Mở trình duyệt và truy cập: http://localhost:8080
 ```
 
-### 2. Khởi động Spring Boot
+Nếu bạn muốn lấy file `history.log` từ bên trong container ra ngoài để kiểm tra:
+```bash
+docker cp mybignumber:/app/history.log ./history.log
+cat history.log
+```
+
+### Cách 2: Chạy trực tiếp (Local Development)
+
+Nếu bạn muốn phát triển và chạy trực tiếp trên máy của mình (yêu cầu máy có Java và g++):
 
 ```bash
-cd MyBigNumberWeb
+# 1. Biên dịch C++ Core
+cd cpp_src
+g++ -std=c++11 -O2 -static -o mybignumber_core main.cpp src/MyBigNumber.cpp
 
-# Cấp quyền thực thi cho mybignumber_core (nếu cần)
-chmod +x mybignumber_core
+# 2. Copy file thực thi ra thư mục gốc của project web
+cp mybignumber_core ../
+cd ..
 
-# Chạy ứng dụng
+# 3. Chạy Spring Boot
 ./mvnw spring-boot:run
+
+# 4. Mở trình duyệt và truy cập: http://localhost:8080
 ```
 
-### 3. Mở trình duyệt
-
-Truy cập: **http://localhost:8080**
+---
 
 ## 📁 Cấu trúc thư mục
 
-```
+```text
 MyBigNumberWeb/
-├── .mvn/wrapper/               # Maven Wrapper
-├── src/main/
+├── cpp_src/                    # Mã nguồn C++ (Logic cốt lõi)
+│   ├── main.cpp                
+│   └── src/                    
+├── src/main/                   # Mã nguồn Java Spring Boot
 │   ├── java/com/example/mybignumber/
-│   │   ├── MyBigNumberWebApplication.java    # Entry point
+│   │   ├── MyBigNumberWebApplication.java    
 │   │   └── controller/
-│   │       └── BigNumberController.java      # Xử lý request, gọi C++, parse log
+│   │       └── BigNumberController.java      
 │   └── resources/
-│       ├── application.properties            # Cấu hình (port, đường dẫn C++)
+│       ├── application.properties            
 │       └── templates/
-│           └── index.html                    # Giao diện Thymeleaf + Bootstrap 5
+│           └── index.html                    
+├── Dockerfile                  # Cấu hình Docker multi-stage build
+├── .dockerignore               # Loại trừ file build docker
+├── .gitignore                  
 ├── mvnw                        # Maven Wrapper script
-├── mybignumber_core            # File thực thi C++ (không commit vào git)
 ├── pom.xml                     # Maven dependencies
+├── REPORT.md                   # Báo cáo kỹ thuật chi tiết của dự án
 └── README.md
 ```
 
 ## 🎨 Giao diện
 
-- **Dark glassmorphism** — nền gradient tối với hiệu ứng kính mờ
-- **Animated background** — các orb màu gradient chuyển động
-- **Two-column layout** — form nhập trái, kết quả phải
-- **Step timeline** — hiển thị từng bước tính toán với badge đánh số
-- **Responsive** — tự động xếp dọc trên màn hình nhỏ
+- **Minimalist** — Giao diện trắng đen tối giản, tập trung vào nội dung.
+- **Two-column layout** — Form nhập liệu bên trái, kết quả tính toán bên phải.
+- **Step timeline** — Hiển thị chi tiết từng bước tính toán với các huy hiệu đánh số thứ tự rõ ràng.
+- **Responsive** — Tự động căn chỉnh xếp dọc khi truy cập bằng thiết bị di động.
 
 ## 🧪 Test cases gợi ý
 
@@ -108,12 +129,9 @@ MyBigNumberWeb/
 
 ## ⚠️ Lưu ý
 
-- File `mybignumber_core` là binary, **không nên commit vào Git**. Hãy thêm vào `.gitignore`.
-- Mỗi lần biên dịch lại C++ source, nhớ copy file mới sang thư mục `MyBigNumberWeb/`.
-- Có thể thay đổi đường dẫn file thực thi trong `application.properties`:
-  ```properties
-  app.core.path=./mybignumber_core
-  ```
+- File thực thi `mybignumber_core` được tạo ra trong quá trình biên dịch không nên commit vào Git (đã được cấu hình trong `.gitignore`).
+- Khi chạy trên các môi trường đám mây (Render, Railway,...), hãy sử dụng Docker để tránh lỗi khác biệt hệ điều hành (macOS vs Linux) và thiếu thư viện (glibc).
+- Chi tiết hơn về kiến trúc và cách giải quyết lỗi, vui lòng xem [REPORT.md](./REPORT.md).
 
 ## 📄 License
 
